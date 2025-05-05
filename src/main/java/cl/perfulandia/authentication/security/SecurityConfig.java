@@ -15,31 +15,15 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.core.userdetails.User;
 
-import cl.perfulandia.authentication.repository.UserRepository;
-
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final UserRepository userRepository;
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return username -> {
-            cl.perfulandia.authentication.model.User user = userRepository.findByUsername(username)
-                    .orElseThrow();
-            return User.builder()
-                    .username(user.getUsername())
-                    .password(user.getPassword())
-                    .build();
-        };
-    }
 
     @Bean
     public AuthenticationManager authenticationManager(PasswordEncoder encoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-        provider.setUserDetailsService(userDetailsService());
         provider.setPasswordEncoder(encoder);
         return new ProviderManager(provider);
     }
